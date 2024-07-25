@@ -1,0 +1,102 @@
+int main() {
+    char* s = malloc(4);
+    s[0] = 'L';
+    s[1] = 'E';
+    s[2] = 'O';
+    s[3] = '\0';
+
+    s = realloc(s, 8);
+    s[3] = 'N';
+    s[4] = 'A';
+    s[5] = 'R';
+    s[6] = 'D';
+    s[7] = '\0';
+
+    s = realloc(s, 10);
+    s[7] = 'O';
+    s[8] = '\0';
+
+    print(s)
+    free(s)
+    return s.length()
+}
+
+
+
+.text
+main:
+addi sp, sp, -12
+sw ra, 8(sp)
+
+addi sp, sp, -4
+li x10, 4
+sw x10, 0(sp)
+call malloc
+addi sp, sp, 4
+sw x10, 0(sp)
+
+li x11, 76
+sb x11, 0(x10)
+li x11, 69
+sb x11, 1(x10)
+li x11, 79
+sb x11, 2(x10)
+li x11, 0
+sb x11, 3(x10)
+
+lw x15, 0(sp)
+addi sp, sp, -8
+li x10, 8
+sw x15, 0(sp)
+sw x10, 4(sp)
+call realloc
+addi sp, sp, 8
+sw x10, 0(sp)
+
+li x11, 78
+sb x11, 3(x10)
+li x11, 65
+sb x11, 4(x10)
+li x11, 82
+sb x11, 5(x10)
+li x11, 68
+sb x11, 6(x10)
+li x11, 0
+sb x11, 7(x10)
+
+lw x15, 0(sp)
+addi sp, sp, -8
+li x10, 10
+sw x15, 0(sp)
+sw x10, 4(sp)
+call realloc
+addi sp, sp, 8
+sw x10, 0(sp)
+
+li x11, 79
+sb x11, 7(x10)
+li x11, 0
+sb x11, 8(x10)
+
+addi sp, sp, -4
+sw x10, 0(sp)
+call print
+addi sp, sp, 4
+
+addi sp, sp, -4
+sw x10, 0(sp)
+call strlen
+addi sp, sp, 4
+
+sw x10, 4(sp) # ret value
+lw x11, 0(sp)
+addi sp, sp, -4
+sw x11, 0(sp)
+call free
+addi sp, sp, 4
+
+lw x10, 4(sp)
+
+lw ra, 8(sp)
+addi sp, sp, 12
+ret

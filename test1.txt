@@ -1,0 +1,11 @@
+.text
+main:
+
+addi sp, sp, -4
+li x11, -123643
+sh, x11, 0(sp)
+lb, x10, 0(sp)
+addi sp, sp, 4
+ret
+
+

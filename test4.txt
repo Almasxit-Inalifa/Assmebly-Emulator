@@ -1,0 +1,63 @@
+# include <stdio.h>
+
+# void fibonacci(int n) {
+#    int i;
+#    int first = 0;
+#    int second = 1;
+#    int next;
+#
+#    for (i = 0; i < n; ++i) {
+#        next = first + second;
+#        first = secon;
+#        second = next;
+#    }
+# }
+#
+# int main() {
+#     int num = 19;
+#     return fibonacci(num);
+# }
+
+.text
+main:
+
+addi sp, sp, -8
+sw ra, 4(sp)
+
+li x10, 19
+sw x10, 0(sp)
+
+call fibonacci
+
+lw ra, 4(sp)
+addi sp, sp, 8
+ret
+
+fibonacci:
+addi sp, sp, -4     
+sw ra, 0(sp)       
+
+lw x10, 4(sp) # n
+
+# Initialize variables
+li x11, 0   # first = 0
+li x12, 1   # second = 1
+
+# Loop to calculate Fibonacci series
+li x14, 0 # Loop counter
+
+loop:
+# Calculate next term
+add x13, x11, x12  # x13 = x11 + x12
+mv x11, x12  # x11 = x12
+mv x12, x13  # x12 = x13
+
+# Check loop condition
+addi x14, x14, 1       # Increment loop counter
+blt x14, x10, loop    # Branch if loop counter < num
+
+# Epilogue
+lw ra, 0(sp)  # Restore return address
+addi sp, sp, 4  # Deallocate space for local variables
+mv x10, x11 # res
+ret

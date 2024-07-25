@@ -1,0 +1,185 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+int nthPrime(int n) {
+    const int MAX_SIZE = 1000; // Adjust this as needed
+    bool* isPrime = malloc(MAX_SIZE);
+    
+    // Initialize all numbers as prime
+    for (int i = 2; i < MAX_SIZE; ++i)
+        isPrime[i] = true;
+
+    // Apply Sieve of Eratosthenes
+    for (int p = 2; p * p < MAX_SIZE; ++p) {
+        if (isPrime[p]) {
+            for (int i = p * p; i < MAX_SIZE; i += p)
+                isPrime[i] = false;
+        }
+    }
+
+    // Count prime numbers
+    int count = 0, prime = 0;
+    for (int i = 2; i < MAX_SIZE; ++i) {
+        if (isPrime[i]) {
+            count++;
+            if (count == n) {
+                prime = i;
+                break;
+            }
+        }
+    }
+
+    free(isPrime);
+
+    return prime;
+}
+
+int main() {
+    int n = 17; 
+    return nthPrime(n);
+}
+
+
+main:
+addi sp, sp, -8
+sw ra, 4(sp)
+li x10, 17 # n
+sw x10, 0(sp)
+
+call nthPrime
+
+lw ra, 4(sp)
+addi sp, sp, 8
+ret
+
+
+nthPrime:
+addi sp, sp, -32  
+sw  ra, 28(sp)  
+
+li t0, 1000
+sw t0, 0(sp) # MAX_SIZE
+
+addi sp, sp, -4
+sw t0, 0(sp)
+call malloc
+addi sp, sp, 4 
+
+sw a0, 4(sp) # bool* isPrime
+
+li t2, 2
+sw t2, 8(sp) # i
+
+first_for:
+lw x10, 8(sp) # i
+lw x11, 0(sp) # MAX_SIZE
+bge x10, x11 outside_first_for
+lw x10, 4(sp) # bool*
+lw a1, 8(sp) # i
+add x10, x10, a1 # &isPrime[i]
+li t3, 1
+sb t3, 0(x10)# isPrime[i] = 1
+
+# i++
+lw x10, 8(sp)
+addi x10, x10, 1
+sw x10, 8(sp)
+
+j first_for
+
+outside_first_for:
+
+li t1, 2
+sw t1, 12(sp) # p
+
+second_for:
+lw a0, 12(sp)
+mul a0, a0, a0 # p^2
+lw a1, 0(sp) # MAX_SIZE
+bge a0, a1, outside_second_for
+
+lw x10, 4(sp) # isPrime
+lw x11, 12(sp) # p
+add x10, x10, x11 # &isPrime[p]
+lb x10, 0(x10)
+beq x0, x10 outside_first_if
+
+lw x11, 12(sp) # p
+mul x11, x11, x11 # p^2
+sw x11, 8(sp) # i = p^2
+
+third_for:
+lw x10, 8(sp) # i
+lw x11, 0(sp) # MAX_SIZE
+bge x10, x11 outside_first_if
+lw x10, 4(sp) # isPrime
+lw x11, 8(sp) # i
+add x10, x10, x11 # & isPrime[i]
+sb x0, 0(x10) # isPrime[i] = 0
+
+# i += p
+lw x10, 8(sp) # i
+lw x11, 12(sp) # p
+add x10, x10, x11 # i + p
+sw x10, 8(sp)
+
+j third_for
+
+outside_first_if:
+
+lw x11, 12(sp) # p
+addi x11, x11, 1
+sw x11, 12(sp)
+
+j second_for
+
+
+outside_second_for:
+
+sw x0, 16(sp) # count
+sw x0, 20(sp) # prime
+
+li t0, 2
+sw t0, 8(sp) # i
+fourth_for:
+lw x10, 8(sp) # i
+lw x11, 0(sp) # MAX_SIZE
+bge x10, x11, outside_fourth_for
+
+lw x10, 4(sp) # isPrime
+lw x11, 8(sp) # i
+add x10, x10, x11 # &isPrime[i]
+lb x10, 0(x10)
+
+beq x0, x10 outside_ifs
+lw x10, 16(sp) # count
+addi x10, x10, 1 # count
+sw x10, 16(sp)
+
+lw x11, 32(sp) # n
+
+bne x10, x11 outside_ifs
+lw x10, 8(sp) # i
+sw x10, 20(sp) # prime = i
+j outside_fourth_for
+
+outside_ifs:
+lw x10, 8(sp) # i
+addi x10, x10, 1
+sw x10, 8(sp)
+
+j fourth_for
+
+outside_fourth_for:
+
+lw x10, 4(sp)
+addi sp, sp, -4
+sw x10, 0(sp)
+call free
+addi sp, sp, 4
+
+lw x10, 20(sp) # prime
+
+lw ra, 28(sp)
+addi sp, sp, 32
+ret

@@ -1,0 +1,190 @@
+# int main() {
+#   char* arr = malloc(8)
+#   arr = "\0edcba";
+#   int n = 6;
+#   int elemsize = 1;
+#   reverse(arr, n, elemSize);
+#
+#   print(arr);
+#   int len = strlen(arr);
+#   free(arr);
+#   return len;
+# }
+
+
+# 
+# void reverse(char *arr, int n, int elemSize) {
+#  for (int i = 0; i < n / 2; i++) {
+#    int j = n - i - 1;
+#    char *to = arr + i * elemSize;
+#    char *from = arr + j * elemSize;
+#    for (int k = 0; k < elemSize; k++) {
+#      char c = from[k];
+#      arr[j] = to[k]; 
+#      arr[i] = c; 
+#    }
+#  }
+# }
+
+.text
+
+main:
+addi sp, sp, -16
+sw ra, 12(sp)
+
+addi sp, sp, -4
+li x10, 8
+sw x10, 0(sp)
+call malloc
+addi sp, sp, 4
+
+sw x10, 0(sp)
+li x11, 0 # '/0'
+sb x11, 0(x10)
+li x12, 101 # 'e'
+sb x12, 1(x10)
+li x13, 100 # 'd'
+sb x13, 2(x10)
+li x14, 99 # 'c'
+sb x14, 3(x10)
+li x15, 98 # 'b'
+sb x15, 4(x10)
+li x16, 97 # 'a'
+sb x16, 5(x10) 
+
+# char* arr = "\0edcba"
+
+li x17, 6
+sw x17, 4(sp) # n = 6
+
+li x18, 1 
+sw x18, 8(sp) # elemsize = 1
+
+call reverse
+
+lw x10, 0(sp) # char* arr
+addi sp, sp, -4
+sw x10, 0(sp)
+call strlen
+addi sp, sp, 4
+
+addi sp, sp, -4
+sw x10, 0(sp) #  len
+
+lw x10, 4(sp)
+addi sp, sp, -4
+sw x10, 0(sp)
+call free
+addi sp, sp, 4
+
+lw x10, 0(sp) # return len
+lw ra, 16(sp)
+addi sp, sp, 20
+
+ret
+
+reverse:
+### IMPLEMENT
+addi sp, sp, -25
+sw ra, 21(sp)
+
+sw x0, 17(sp) # i = 0
+# line 1
+for_one:
+lw x10, 17(sp) # i
+lw x11, 29(sp) # n
+li x12, 2
+div x11, x11, x12 # n / 2
+
+bge x10, x11 outside_first_for
+# inside first for
+lw x10, 17(sp) # i
+lw x11, 29(sp) # n
+li x12, 1 
+
+sub x13, x11, x10
+sub x13, x13, x12
+sw x13, 13(sp) # j =
+
+# line 3
+lw x10, 25(sp) # arr
+lw x11, 17(sp) # i
+lw x12, 33(sp) # elemsize
+
+mul x14, x11, x12
+add x10, x10, x14 # arr + i * elemsize
+sw x10, 9(sp) # to = 
+
+# line 4
+lw x10, 25(sp) # arr
+lw x11, 13(sp) # j
+lw x12, 33(sp) # elemsize
+
+mul x14, x11, x12
+add x10, x10, x14
+sw x10, 5(sp) # from =
+
+# line 5
+# k for
+sw x0, 1(sp) # k = 0
+
+for_second:
+lw x10, 1(sp) # k
+lw x11, 33(sp) # elemsize
+bge x10, x11 outside_second_for
+# inside second for
+#line 6
+lw x10, 5(sp) # from
+lw x11, 1(sp) # k
+add x10, x10, x11 # from + k = &from[k]
+lb x12, 0(x10) # from[k]
+sb x12, 0(sp) # c = 
+
+# line 7
+lw x10, 9(sp) # to
+lw x11, 1(sp) # k
+add x10, x10, x11 # &to[k]
+lb x12, 0(x10) # to[k]
+
+lw x10, 25(sp) # arr
+lw x11, 13(sp) # j
+add x10, x10, x11 # &arr[j]
+sb x12, 0(x10)
+
+# line 8
+lb x10, 0(sp) # c
+
+lw x11, 25(sp) # arr
+lw x12, 17(sp) # i
+add x11, x11, x12
+sb x10, 0(x11)
+
+# k++
+lw x10, 1(sp)
+addi x10, x10, 1
+sw x10, 1(sp)
+
+j for_second
+
+outside_second_for:
+
+#i++
+lw x10, 17(sp) # i
+addi x10, x10, 1
+sw x10, 17(sp)
+
+j for_one
+
+outside_first_for:
+
+# print reverse array (it should print abcde)
+lw x10, 25(sp) # char* arr
+addi sp, sp, -4
+sw x10, 0(sp)
+call print
+addi sp, sp, 4
+
+lw ra, 21(sp)
+addi sp, sp, 25
+
+ret

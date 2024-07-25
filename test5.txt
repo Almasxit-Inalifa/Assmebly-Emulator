@@ -1,0 +1,97 @@
+# typedef struct {
+#   char c;
+#   short s[2];
+#   int i;
+# } Data;
+
+# typedef void (*PopulateFn)(int num, Data *d);
+
+# void castFn (int num, Data* d) {
+#   d -> c = (char)num;
+#   d -> s[0] = (short)num;
+#   d -> s[1] = (short)num;
+#   d -> i = num;
+# }
+
+# int main() {
+#   int num = 17246;
+#   return StructSum(num, cast);
+# }
+
+# int StructSum(int num, PopulateFn popFn) {
+#   Data d;
+#   popFn(num, &d);
+#   return d.c + d.s[0] + d.s[0] + d.s[1] + d.i;
+# }
+
+
+.text
+
+castFn:
+addi sp, sp, -4
+sw ra, 0(sp)
+
+lw x11, 8(sp) # Data* d
+
+lb x10, 4(sp) # (char)num
+sb x10, 0(x11) # d -> c = 
+
+lh x10, 4(sp) # (short)num
+sh x10, 1(x11) # d -> s[0] = 
+sh x10, 3(x11) # d -> s[1] = 
+
+lw x10, 4(sp) # num
+sw x10, 5(x11) # d -> i = 
+
+lw ra, 0(sp)
+addi sp, sp, 4
+
+ret
+
+StructSum:
+addi sp, sp, -13
+sw ra, 9(sp)
+
+# line 2
+lw x10, 13(sp) # num
+mv x11, sp
+
+addi sp, sp, -8
+sw x10, 0(sp)
+sw x11, 4(sp)
+
+lw x14, 25(sp)
+jalr x14 # calling FUNCTION
+
+addi sp, sp, 8
+
+lb x11, 0(sp) # c
+lh x12, 1(sp) # d.s[0]
+lh x13, 3(sp) # d.s[1]
+lw x14, 5(sp) # i
+
+add x10, x11, x12
+add x10, x10, x12
+add x10, x10, x13
+add x10, x10, x14
+
+lw ra, 9(sp)
+addi sp, sp, 13
+
+ret
+
+
+main:
+addi sp, sp, -12
+sw ra, 8(sp)
+
+li x10, 17246
+sw x10, 0(sp)
+la x10, castFn
+sw x10, 4(sp)
+
+call StructSum
+
+lw ra, 8(sp)
+addi sp, sp, 12
+ret

@@ -1,0 +1,19 @@
+.text
+
+sum:
+lw x10, 0(sp)
+lw x11, 4(sp)
+add x10, x10, x11
+ret
+
+main:
+addi sp, sp, -8
+li x10, 16
+li x11, 34
+sw x10, 0(sp)
+sw x11, 4(sp)
+call sum
+addi sp, sp, 8
+ret
+
+

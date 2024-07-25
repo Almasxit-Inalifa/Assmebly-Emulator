@@ -1,0 +1,64 @@
+#include <stdio.h>
+
+# int factorial(int n) {
+#    if (n <= 1)
+#        return 1;
+#    else
+#        return n * factorial(n - 1);
+# }
+
+# int main() {
+#    int num = 12;
+#    return factorial(num);;
+# }
+
+.text
+main:
+addi sp, sp, -8
+sw ra, 4(sp)
+
+li x10, 12
+sw x10, 0(sp)
+
+call factorial
+
+lw ra, 4(sp)
+addi sp, sp, 8
+ret
+
+factorial:
+
+addi sp, sp, -4
+sw ra, 0(sp)
+
+# Base case: if n <= 1, return 1
+lw x10, 4(sp) # n
+li x11, 1
+ble x10, x11, base_case
+j recursion
+j end_factorial
+
+base_case:
+li x10, 1
+j end_factorial
+
+recursion:
+# Calculate factorial(n-1)
+lw x12, 4(sp) # n
+addi x12, x12, -1
+
+addi sp, sp, -4
+sw x12, 0(sp)
+call factorial
+addi sp, sp, 4
+
+# now x10 stores recursion res
+
+# Multiply by n
+lw x11, 4(sp)
+mul x10, x10, x11
+
+end_factorial:
+lw ra, 0(sp)
+addi sp, sp, 4
+jr ra

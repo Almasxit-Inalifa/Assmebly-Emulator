@@ -1,0 +1,295 @@
+
+# typedef bool(*IsLower)(char);
+
+# typedef struct {
+#   int salary;  
+#   char* name;
+# } Employee;
+
+# bool lower(char c) {
+#   return (c >= 'a' && c <= 'z');
+# }
+
+# int main() {
+#   int num_employees = 5;
+#   Employee* employees = malloc(sizeof(Employee) * num_employees);
+#   for (int i = 0; i < num_employees; i++) {
+#     employees[i].salary = i * 1200;
+#     employees[i].name = malloc(5);
+#     employees[i].name[0] = 'm';
+#     employees[i].name[1] = 'a';
+#     employees[i].name[2] = 'r';
+#     employees[i].name[3] = 'k';
+#     employees[i].name[4] = '\0';
+#   }
+# 
+#   char* ours = EmployeWithHighestSalary(num_employees, employees, lower);
+#   print(ours);
+#   for (int i = 0; i < num_employees; i++) {
+#       free(employees[i].name);
+#   }
+#   free(employees);
+#   free(ours);
+#   return;
+# }
+
+# char* EmployeWithHighestSalary(int num_employees, Employee* employees, IsLower is_lower) {
+#   int len = strlen(employees[num_employees - 1].name);
+#   char* upper = malloc(len * sizeof(char) + 1);
+#   for (int i = 0; i < len; ++i) {
+#     char ch = employees[num_employees - 1].name[i];
+#     if (is_lower(ch)) {
+#       upper[i] = 'A' + ch - 'a';
+#     }
+#   }
+#   upper[len] = '\0';
+#   return upper;
+# }
+
+.text
+main:
+addi sp, sp, -16
+sw ra, 12(sp)
+
+li x10, 5 # num_employees
+sw x10, 8(sp)
+
+addi sp, sp, -4
+li x11, 8
+mul x10, x10, x11
+sw x10, 0(sp)
+call malloc
+addi sp, sp, 4
+sw x10, 4(sp)
+
+sw x0, 0(sp) # i = 0
+
+main_for:
+lw x10, 0(sp) # i
+lw x11, 8(sp) # num_employees
+bge x10, x11 outside_main_for
+# inside main for
+
+lw x10, 4(sp) # employees
+lw x11, 0(sp) # i
+li x12, 8 # sizeof(Employee)
+mul x11, x11, x12
+add x10, x10, x11 # &employees[i]
+
+lw x11, 0(sp) # i
+li x12, 1200 
+mul x11, x11, x12 # i * 1200
+sw x11, 0(x10) # employees[i].salary = i * 1200
+
+# malloc
+li x10, 5
+addi sp, sp, -4
+sw x10, 0(sp)
+call malloc
+addi sp, sp, 4
+
+lw x11, 4(sp) # employees
+lw x12, 0(sp) # i
+li x13, 8 # sizeof(Employee)
+mul x12, x12, x13
+add x11, x11, x12 # &employees[i]
+sw x10, 4(x11) # employees[i].name = malloc(5)
+
+# now x10 stores employees[i].name
+li x11, 109 # m
+sb x11, 0(x10)
+li x11, 97 # a
+sb x11, 1(x10)
+li x11, 114 # r
+sb x11, 2(x10)
+li x11, 107 # k
+sb x11, 3(x10)
+li x11, 0 # \0
+sb x11, 4(x10)
+
+# i++
+lw x10, 0(sp)
+addi x10, x10, 1
+sw x10, 0(sp)
+
+j main_for
+
+outside_main_for:
+
+lw x10, 8(sp) # num_employees
+lw x11, 4(sp) # employees
+la x12, lower
+
+addi sp, sp, -12
+
+sw x10, 0(sp)
+sw x11, 4(sp)
+sw x12, 8(sp)
+
+call EmployeWithHighestSalary
+
+addi sp, sp, 12
+
+addi sp, sp, -4
+sw x10, 0(sp) # ours
+
+call print
+
+# free names
+addi sp, sp, -4
+sw x0, 0(sp) # i = 0
+free_for:
+lw x10, 0(sp)
+lw x11, 16(sp) # num_employees
+bge x10, x11 outside_free_for
+lw x10, 12(sp) # employees
+lw x11, 0(sp) # i
+li x12, 8
+mul x11, x11, x12 # i * sizeof(Employee)
+add x10, x10, x11 # &employees[i]
+addi x10, x10, 4 # &employees[i].name
+lw x10, 0(x10)
+
+addi sp, sp, -4
+sw x10, 0(sp)
+call free
+addi sp, sp, 4
+
+# i++
+lw x10, 0(sp)
+addi x10, x10, 1
+sw x10, 0(sp)
+
+j free_for
+
+outside_free_for:
+
+lw x10, 12(sp) # employees
+addi sp, sp, -4
+sw x10, 0(sp)
+call free
+addi sp, sp, 4
+
+lw x10, 4(sp) # ours
+addi sp, sp, -4
+sw x10, 0(sp)
+call free
+addi sp, sp, 4
+
+lw ra, 20(sp)
+addi sp, sp, 24
+
+ret
+
+lower:
+addi sp, sp, -4
+sw ra, 0(sp)
+
+li x10, 1
+li x11, 1
+lb x12, 4(sp) # c
+li x13, 97 # 'a'
+li x14, 122 # 'z'
+
+bge x12, x13 check_ble_z
+li x10, 0
+
+check_ble_z:
+ble x12, x14 ret_bool
+li x11, 0
+
+ret_bool:
+and x10, x10, x11
+
+lw ra, 0(sp)
+addi sp, sp, 4
+ret
+
+EmployeWithHighestSalary:
+addi sp, sp, -20
+sw ra, 16(sp) # save ra
+
+# line 2
+lw x11, 24(sp) # employees
+lw x12, 20(sp) # num_employees
+li x14, 1
+sub x12, x12, x14 # num_employees - 1
+li x13, 8 # sizeof(Employee)
+mul x12, x12, x13 # offset
+add x11, x11, x12 # &employees[num_emp - 1]
+addi x11, x11, 4 # &employees[num_emp - 1].name
+lw x11, 0(x11) # employees[num_emp - 1].name
+addi sp, sp, -4
+sw x11, 0(sp) # argument
+call strlen
+addi sp, sp, 4
+sw x10, 12(sp) # int len = rv of strlen
+
+# line 3
+lw x11, 12(sp) # len
+li x12, 1 # sizeof(char)
+mul x11, x11, x12 # len * sizeof(char)
+addi x11, x11, 1 # len * sizeof(char) + 1
+addi sp, sp, -4
+sw x11, 0(sp) # argument
+call malloc
+addi sp, sp, 4
+sw x10, 8(sp) # char* upper = rv of malloc
+
+# line 4
+sw x0, 4(sp) # i = 0
+for:
+lw x11, 4(sp) # i
+lw x12, 12(sp) # len
+bge x11, x12 for_end
+# line 5
+lw x11, 24(sp) # employees
+lw x12, 20(sp) # num_employees
+li x14, 1
+sub x12, x12, x14 # num_employees - 1
+li x13, 8 # sizeof(Employee)
+mul x12, x12, x13 # offset
+add x11, x11, x12 # &employees[num_emp - 1]
+addi x11, x11, 4 # &employees[num_emp - 1].name
+lw x11, 0(x11) # employees[num_emp - 1].name
+
+lw x12, 4(sp) # i
+add x11, x11, x12 # &employees[num_emp - 1].name[i]
+lb x11, 0(x11) # dereference
+sb x11, 0(sp) # char ch = x11
+# line 6
+lb x11, 0(sp) # ch
+lw x14, 28(sp) # is_lower
+addi sp, sp, -4
+sb x11, 0(sp) # argument
+jalr x14
+addi sp, sp, 4
+# line 7
+beq x10, x0 false
+lb x11, 0(sp) 
+addi x11, x11, 65 # 'A' + ch
+li x12, 97 # 'a'
+sub x11, x11, x12 # 'A' + ch - 'a'
+
+lw x12, 4(sp) # i
+lw x13, 8(sp) # upper
+add x13, x13, x12 # &upper[i]
+sw x11, 0(x13) 
+
+false:
+lw x11, 4(sp) #i 
+addi x11, x11, 1 # i++
+sw x11, 4(sp)
+j for
+
+for_end:
+lw x11, 8(sp) # upper
+lw x12, 12(sp) # len
+add x11, x11, x12 # &upper[len]
+li x13, 0
+sb x13, 0(x11) # upper[len] = '\0'
+
+lw x10, 8(sp)
+lw ra, 16(sp) 
+addi sp, sp, 20
+ret
