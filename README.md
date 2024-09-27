@@ -1,5 +1,7 @@
 გაშვება: 
+
 g++ main.cpp tests.cpp emulator.cpp executor.cpp -a.out
+
 ./a.out
 
 ყველა იმპლემენტირებული assembly ბრძანების ჩამონათვალი შეგიძლიათ იხილოთ emulator.h ფაილში.
