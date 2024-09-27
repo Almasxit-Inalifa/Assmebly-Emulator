@@ -16,5 +16,9 @@ executor:
 
 emulator:
  ასრულებს assembly ბრძანებებს და გამოჰყოფს მეხსიერებას (unsigned char-ების მასივი, რომლიც პირველი ნახევარი გამოყოფილია stack-ისთვის, ხოლო მეორე ნახევარი - heap-ისთვის (გათვლილია malloc, realloc და free ბრძანებებისთვის)).
+
+ 
 <img width="821" alt="Screenshot 2024-09-27 at 13 05 15" src="https://github.com/user-attachments/assets/35ce17b4-5bbf-422e-8807-af0d2be88534">
-![Emulator Diagrama](https://github.com/user-attachments/assets/108c3a06-935e-44db-9c20-6bd0ef29c593)
+
+
+<img width="435" alt="Screenshot 2024-09-27 at 13 20 38" src="https://github.com/user-attachments/assets/6323b4da-f432-4dc8-aae4-e081452f46c4">
