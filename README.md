@@ -21,4 +21,4 @@ emulator:
 <img width="821" alt="Screenshot 2024-09-27 at 13 05 15" src="https://github.com/user-attachments/assets/35ce17b4-5bbf-422e-8807-af0d2be88534">
 
 
-<img width="435" alt="Screenshot 2024-09-27 at 13 20 38" src="https://github.com/user-attachments/assets/6323b4da-f432-4dc8-aae4-e081452f46c4">
+<img width="433" alt="Screenshot 2024-09-27 at 13 21 33" src="https://github.com/user-attachments/assets/25c6b972-ec80-42f7-8b53-d86369bc9200">
